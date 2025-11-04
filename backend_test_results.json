@@ -1,0 +1,184 @@
+{
+  "summary": {
+    "total_tests": 29,
+    "passed_tests": 26,
+    "success_rate": 89.65517241379311,
+    "timestamp": "2025-10-30T17:35:44.588737"
+  },
+  "detailed_results": [
+    {
+      "test": "User Registration",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-10-30T17:35:29.997014"
+    },
+    {
+      "test": "User Login",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-10-30T17:35:30.272196"
+    },
+    {
+      "test": "Get Current User",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-10-30T17:35:30.310573"
+    },
+    {
+      "test": "News Verification (Text)",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-10-30T17:35:35.277052"
+    },
+    {
+      "test": "Verification Response Structure",
+      "success": true,
+      "details": "All required fields present",
+      "timestamp": "2025-10-30T17:35:35.277696"
+    },
+    {
+      "test": "News Verification (URL)",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-10-30T17:35:39.492677"
+    },
+    {
+      "test": "Verification History",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-10-30T17:35:39.528715"
+    },
+    {
+      "test": "History Response Format",
+      "success": true,
+      "details": "Returned 2 items",
+      "timestamp": "2025-10-30T17:35:39.529337"
+    },
+    {
+      "test": "Trending News (Public)",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-10-30T17:35:39.568605"
+    },
+    {
+      "test": "Trending Response Format",
+      "success": true,
+      "details": "Returned 8 items",
+      "timestamp": "2025-10-30T17:35:39.569337"
+    },
+    {
+      "test": "NewsAPI Default (General News)",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-10-30T17:35:39.764898"
+    },
+    {
+      "test": "NewsAPI Article Structure",
+      "success": true,
+      "details": "All required fields present in 18 articles",
+      "timestamp": "2025-10-30T17:35:39.765718"
+    },
+    {
+      "test": "NewsAPI Response Structure",
+      "success": true,
+      "details": "Valid structure with 18 articles",
+      "timestamp": "2025-10-30T17:35:39.765739"
+    },
+    {
+      "test": "NewsAPI Category: technology",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-10-30T17:35:39.976888"
+    },
+    {
+      "test": "NewsAPI technology Format",
+      "success": true,
+      "details": "Returned 20 articles",
+      "timestamp": "2025-10-30T17:35:39.977604"
+    },
+    {
+      "test": "NewsAPI Category: sports",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-10-30T17:35:40.217592"
+    },
+    {
+      "test": "NewsAPI sports Format",
+      "success": true,
+      "details": "Returned 18 articles",
+      "timestamp": "2025-10-30T17:35:40.218276"
+    },
+    {
+      "test": "NewsAPI Category: business",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-10-30T17:35:40.390961"
+    },
+    {
+      "test": "NewsAPI business Format",
+      "success": true,
+      "details": "Returned 19 articles",
+      "timestamp": "2025-10-30T17:35:40.391808"
+    },
+    {
+      "test": "NewsAPI Category: health",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-10-30T17:35:40.589098"
+    },
+    {
+      "test": "NewsAPI health Format",
+      "success": true,
+      "details": "Returned 18 articles",
+      "timestamp": "2025-10-30T17:35:40.589774"
+    },
+    {
+      "test": "NewsAPI Category: all",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-10-30T17:35:40.796912"
+    },
+    {
+      "test": "NewsAPI 'all' Category Format",
+      "success": true,
+      "details": "Returned 18 articles",
+      "timestamp": "2025-10-30T17:35:40.797621"
+    },
+    {
+      "test": "Chatbot Endpoint",
+      "success": true,
+      "details": "Status: 200",
+      "timestamp": "2025-10-30T17:35:44.406617"
+    },
+    {
+      "test": "Chatbot Response Format",
+      "success": true,
+      "details": "Response length: 661",
+      "timestamp": "2025-10-30T17:35:44.407327"
+    },
+    {
+      "test": "Verify Without Auth (Should Fail)",
+      "success": false,
+      "details": "Expected 401, got 403 - {'detail': 'Not authenticated'}",
+      "timestamp": "2025-10-30T17:35:44.440621"
+    },
+    {
+      "test": "History Without Auth (Should Fail)",
+      "success": false,
+      "details": "Expected 401, got 403 - {'detail': 'Not authenticated'}",
+      "timestamp": "2025-10-30T17:35:44.516330"
+    },
+    {
+      "test": "Me Without Auth (Should Fail)",
+      "success": false,
+      "details": "Expected 401, got 403 - {'detail': 'Not authenticated'}",
+      "timestamp": "2025-10-30T17:35:44.554550"
+    },
+    {
+      "test": "Invalid Login (Should Fail)",
+      "success": true,
+      "details": "Status: 401",
+      "timestamp": "2025-10-30T17:35:44.587878"
+    }
+  ]
+}

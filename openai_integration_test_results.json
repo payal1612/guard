@@ -1,0 +1,29 @@
+{
+  "summary": {
+    "total_tests": 3,
+    "passed_tests": 3,
+    "success_rate": 100.0,
+    "timestamp": "2025-10-30T17:36:34.862088",
+    "focus": "OpenAI GPT-4o-mini Integration Testing"
+  },
+  "detailed_results": [
+    {
+      "test": "OpenAI News Verification",
+      "success": true,
+      "details": "Classification: Real, Confidence: 85.0%, Evidence length: 804",
+      "timestamp": "2025-10-30T17:36:29.227456"
+    },
+    {
+      "test": "OpenAI Chatbot",
+      "success": true,
+      "details": "Response length: 715 characters",
+      "timestamp": "2025-10-30T17:36:33.658814"
+    },
+    {
+      "test": "Error Handling - Empty Content",
+      "success": true,
+      "details": "Handled empty content gracefully",
+      "timestamp": "2025-10-30T17:36:34.861180"
+    }
+  ]
+}

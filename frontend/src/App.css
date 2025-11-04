@@ -1,0 +1,78 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: linear-gradient(135deg, #e3f2fd 0%, #f5f9ff 50%, #e8f5e9 100%);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+.App {
+  min-height: 100vh;
+}
+
+/* Glass morphism effect */
+.glass {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+}
+
+/* Status colors */
+.status-real {
+  color: #2e7d32;
+  background: rgba(46, 125, 50, 0.1);
+}
+
+.status-fake {
+  color: #c62828;
+  background: rgba(198, 40, 40, 0.1);
+}
+
+.status-misleading {
+  color: #f57c00;
+  background: rgba(245, 124, 0, 0.1);
+}
+
+/* Animations */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.animate-pulse-slow {
+  animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Smooth transitions */
+button, a, input, textarea {
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+button:hover, a:hover {
+  transform: translateY(-2px);
+}
+
+button:active, a:active {
+  transform: translateY(0);
+}

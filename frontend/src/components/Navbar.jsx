@@ -1,155 +1,141 @@
-"use client";
-// Inspired by react-hot-toast library
-import * as React from "react"
+import React, { useContext } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { Shield, LogOut, Menu, X } from 'lucide-react';
+import { AuthContext } from '../App';
 
-const TOAST_LIMIT = 1
-const TOAST_REMOVE_DELAY = 1000000
+const Navbar = () => {
+  const { user, logout } = useContext(AuthContext);
+  const location = useLocation();
+  const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
 
-const actionTypes = {
-  ADD_TOAST: "ADD_TOAST",
-  UPDATE_TOAST: "UPDATE_TOAST",
-  DISMISS_TOAST: "DISMISS_TOAST",
-  REMOVE_TOAST: "REMOVE_TOAST"
-}
+  const isActive = (path) => location.pathname === path;
 
-let count = 0
+  const navLinks = [
+    { path: '/', label: 'Home' },
+    { path: '/verify', label: 'Verify', requiresAuth: true },
+    { path: '/trending', label: 'Trending' },
+    { path: '/trending-news', label: 'News' },
+    { path: '/history', label: 'History', requiresAuth: true },
+    { path: '/about', label: 'About' },
+  ];
 
-function genId() {
-  count = (count + 1) % Number.MAX_SAFE_INTEGER
-  return count.toString();
-}
+  const filteredNavLinks = navLinks.filter(link => !link.requiresAuth || user);
 
-const toastTimeouts = new Map()
+  return (
+    <nav className="bg-white shadow-lg sticky top-0 z-40" data-testid="navbar">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between h-16">
+          {/* Logo */}
+          <div className="flex items-center">
+            <Link to="/" className="flex items-center space-x-2" data-testid="navbar-logo">
+              <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-green-600 rounded-lg flex items-center justify-center">
+                <Shield className="w-6 h-6 text-white" />
+              </div>
+              <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent">
+                TruthGuard
+              </span>
+            </Link>
+          </div>
 
-const addToRemoveQueue = (toastId) => {
-  if (toastTimeouts.has(toastId)) {
-    return
-  }
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center space-x-1">
+            {filteredNavLinks.map((link) => (
+              <Link
+                key={link.path}
+                to={link.path}
+                data-testid={`nav-link-${link.label.toLowerCase()}`}
+                className={`px-4 py-2 rounded-lg font-medium transition-all ${
+                  isActive(link.path)
+                    ? 'bg-gradient-to-r from-blue-600 to-green-600 text-white'
+                    : 'text-gray-700 hover:bg-gray-100'
+                }`}
+              >
+                {link.label}
+              </Link>
+            ))}
+          </div>
 
-  const timeout = setTimeout(() => {
-    toastTimeouts.delete(toastId)
-    dispatch({
-      type: "REMOVE_TOAST",
-      toastId: toastId,
-    })
-  }, TOAST_REMOVE_DELAY)
+          {/* User Menu */}
+          <div className="hidden md:flex items-center space-x-4">
+            {user ? (
+              <div className="flex items-center space-x-3">
+                <div className="flex items-center space-x-2 px-3 py-2 bg-gray-100 rounded-lg">
+                  <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-green-600 rounded-full flex items-center justify-center text-white text-sm font-bold">
+                    {user.name?.charAt(0).toUpperCase()}
+                  </div>
+                  <span className="text-sm font-medium text-gray-700" data-testid="user-name">
+                    {user.name}
+                  </span>
+                </div>
+                <button
+                  onClick={logout}
+                  data-testid="logout-button"
+                  className="flex items-center space-x-2 px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                >
+                  <LogOut className="w-5 h-5" />
+                  <span className="font-medium">Logout</span>
+                </button>
+              </div>
+            ) : null}
+          </div>
 
-  toastTimeouts.set(toastId, timeout)
-}
+          {/* Mobile Menu Button */}
+          <div className="md:hidden flex items-center">
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              data-testid="mobile-menu-button"
+              className="p-2 rounded-lg text-gray-700 hover:bg-gray-100"
+            >
+              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
+          </div>
+        </div>
+      </div>
 
-export const reducer = (state, action) => {
-  switch (action.type) {
-    case "ADD_TOAST":
-      return {
-        ...state,
-        toasts: [action.toast, ...state.toasts].slice(0, TOAST_LIMIT),
-      };
+      {/* Mobile Menu */}
+      {mobileMenuOpen && (
+        <div className="md:hidden border-t border-gray-200 bg-white" data-testid="mobile-menu">
+          <div className="px-4 py-3 space-y-2">
+            {filteredNavLinks.map((link) => (
+              <Link
+                key={link.path}
+                to={link.path}
+                onClick={() => setMobileMenuOpen(false)}
+                className={`block px-4 py-2 rounded-lg font-medium transition-all ${
+                  isActive(link.path)
+                    ? 'bg-gradient-to-r from-blue-600 to-green-600 text-white'
+                    : 'text-gray-700 hover:bg-gray-100'
+                }`}
+              >
+                {link.label}
+              </Link>
+            ))}
+            
+            {user && (
+              <div className="pt-3 border-t border-gray-200 space-y-2">
+                <div className="flex items-center space-x-2 px-4 py-2">
+                  <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-green-600 rounded-full flex items-center justify-center text-white text-sm font-bold">
+                    {user.name?.charAt(0).toUpperCase()}
+                  </div>
+                  <span className="text-sm font-medium text-gray-700">{user.name}</span>
+                </div>
+                <button
+                  onClick={() => {
+                    logout();
+                    setMobileMenuOpen(false);
+                  }}
+                  className="w-full flex items-center space-x-2 px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                >
+                  <LogOut className="w-5 h-5" />
+                  <span className="font-medium">Logout</span>
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </nav>
+  );
+};
 
-    case "UPDATE_TOAST":
-      return {
-        ...state,
-        toasts: state.toasts.map((t) =>
-          t.id === action.toast.id ? { ...t, ...action.toast } : t),
-      };
-
-    case "DISMISS_TOAST": {
-      const { toastId } = action
-
-      // ! Side effects ! - This could be extracted into a dismissToast() action,
-      // but I'll keep it here for simplicity
-      if (toastId) {
-        addToRemoveQueue(toastId)
-      } else {
-        state.toasts.forEach((toast) => {
-          addToRemoveQueue(toast.id)
-        })
-      }
-
-      return {
-        ...state,
-        toasts: state.toasts.map((t) =>
-          t.id === toastId || toastId === undefined
-            ? {
-                ...t,
-                open: false,
-              }
-            : t),
-      };
-    }
-    case "REMOVE_TOAST":
-      if (action.toastId === undefined) {
-        return {
-          ...state,
-          toasts: [],
-        }
-      }
-      return {
-        ...state,
-        toasts: state.toasts.filter((t) => t.id !== action.toastId),
-      };
-  }
-}
-
-const listeners = []
-
-let memoryState = { toasts: [] }
-
-function dispatch(action) {
-  memoryState = reducer(memoryState, action)
-  listeners.forEach((listener) => {
-    listener(memoryState)
-  })
-}
-
-function toast({
-  ...props
-}) {
-  const id = genId()
-
-  const update = (props) =>
-    dispatch({
-      type: "UPDATE_TOAST",
-      toast: { ...props, id },
-    })
-  const dismiss = () => dispatch({ type: "DISMISS_TOAST", toastId: id })
-
-  dispatch({
-    type: "ADD_TOAST",
-    toast: {
-      ...props,
-      id,
-      open: true,
-      onOpenChange: (open) => {
-        if (!open) dismiss()
-      },
-    },
-  })
-
-  return {
-    id: id,
-    dismiss,
-    update,
-  }
-}
-
-function useToast() {
-  const [state, setState] = React.useState(memoryState)
-
-  React.useEffect(() => {
-    listeners.push(setState)
-    return () => {
-      const index = listeners.indexOf(setState)
-      if (index > -1) {
-        listeners.splice(index, 1)
-      }
-    };
-  }, [state])
-
-  return {
-    ...state,
-    toast,
-    dismiss: (toastId) => dispatch({ type: "DISMISS_TOAST", toastId }),
-  };
-}
-
-export { useToast, toast }
+export default Navbar;

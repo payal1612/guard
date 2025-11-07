@@ -1,191 +1,203 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { MessageCircle, X, Send, Loader2, Minimize2 } from 'lucide-react';
-import axios from 'axios';
+import React, { useState, useContext } from 'react';
+import { X, Mail, Lock, User, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { AuthContext } from '../App';
+import { toast } from 'sonner';
 
-const Chatbot = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [isMinimized, setIsMinimized] = useState(false);
-  const [messages, setMessages] = useState([
-    {
-      role: 'assistant',
-      content: 'Hi! I\'m TruthGuard Assistant. Ask me anything about fake news detection, how our AI works, or how to use the platform!',
-    },
-  ]);
-  const [input, setInput] = useState('');
+const AuthModal = ({ onClose }) => {
+  const [isLogin, setIsLogin] = useState(true);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
   const [loading, setLoading] = useState(false);
-  const messagesEndRef = useRef(null);
+  const { login, register } = useContext(AuthContext);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
-
-  const handleSend = async () => {
-    if (!input.trim() || loading) return;
-
-    const userMessage = { role: 'user', content: input };
-    setMessages((prev) => [...prev, userMessage]);
-    setInput('');
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     setLoading(true);
 
     try {
-      const response = await axios.post('/chatbot', {
-        message: input,
-        history: messages,
-      });
+      if (isLogin) {
+        await login(email, password);
+        toast.success('Login successful!');
+        onClose();
+      } else {
+        // Validate password
+        if (password.length < 8) {
+          toast.error('Password must be at least 8 characters long');
+          setLoading(false);
+          return;
+        }
+        if (!/[A-Z]/.test(password)) {
+          toast.error('Password must contain at least one uppercase letter');
+          setLoading(false);
+          return;
+        }
+        if (!/[a-z]/.test(password)) {
+          toast.error('Password must contain at least one lowercase letter');
+          setLoading(false);
+          return;
+        }
+        if (!/[0-9]/.test(password)) {
+          toast.error('Password must contain at least one number');
+          setLoading(false);
+          return;
+        }
+        if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+          toast.error('Password must contain at least one special character');
+          setLoading(false);
+          return;
+        }
 
-      setMessages((prev) => [
-        ...prev,
-        { role: 'assistant', content: response.data.response },
-      ]);
+        await register(email, password, name);
+        toast.success('Registration successful!');
+        onClose();
+      }
     } catch (error) {
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: 'assistant',
-          content: 'Sorry, I encountered an error. Please try again.',
-        },
-      ]);
+      console.error('Auth error:', error);
+      const errorMessage = error.response?.data?.detail || 'Authentication failed';
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSend();
-    }
-  };
-
   return (
-    <>
-      {/* Chatbot Button */}
-      {!isOpen && (
-        <motion.button
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
-          onClick={() => setIsOpen(true)}
-          data-testid="chatbot-toggle"
-          className="fixed bottom-6 right-6 w-16 h-16 rounded-full bg-gradient-to-r from-blue-600 to-green-600 text-white shadow-2xl flex items-center justify-center z-50 hover:shadow-3xl"
+    <AnimatePresence>
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.9 }}
+          className="w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden"
+          data-testid="auth-modal"
         >
-          <MessageCircle className="w-8 h-8" />
-        </motion.button>
-      )}
+          {/* Header */}
+          <div className="bg-gradient-to-r from-blue-600 to-green-600 p-6 text-white">
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-bold">
+                {isLogin ? 'Welcome Back' : 'Join TruthGuard'}
+              </h2>
+              <button
+                onClick={onClose}
+                className="p-2 hover:bg-white/20 rounded-lg transition-colors"
+                data-testid="auth-modal-close"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <p className="text-white/80 text-sm mt-1">
+              {isLogin
+                ? 'Sign in to verify news and access your history'
+                : 'Create an account to start detecting fake news'}
+            </p>
+          </div>
 
-      {/* Chatbot Window */}
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: 100, scale: 0.8 }}
-            animate={{ 
-              opacity: 1, 
-              y: 0, 
-              scale: 1,
-              height: isMinimized ? 'auto' : '600px'
-            }}
-            exit={{ opacity: 0, y: 100, scale: 0.8 }}
-            transition={{ duration: 0.3 }}
-            className="fixed bottom-6 right-6 w-96 glass rounded-2xl shadow-2xl z-50 flex flex-col overflow-hidden"
-            data-testid="chatbot-window"
-          >
-            {/* Header */}
-            <div className="bg-gradient-to-r from-blue-600 to-green-600 text-white p-4 flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
-                  <MessageCircle className="w-6 h-6" />
-                </div>
-                <div>
-                  <h3 className="font-bold">TruthGuard Assistant</h3>
-                  <p className="text-xs text-white/80">AI-powered support</p>
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="p-6 space-y-4">
+            {!isLogin && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Full Name
+                </label>
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="John Doe"
+                    required={!isLogin}
+                    disabled={loading}
+                    data-testid="auth-name-input"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50"
+                  />
                 </div>
               </div>
-              <div className="flex items-center space-x-2">
-                <button
-                  onClick={() => setIsMinimized(!isMinimized)}
-                  className="p-2 hover:bg-white/20 rounded-lg transition-colors"
-                  data-testid="chatbot-minimize"
-                >
-                  <Minimize2 className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => setIsOpen(false)}
-                  className="p-2 hover:bg-white/20 rounded-lg transition-colors"
-                  data-testid="chatbot-close"
-                >
-                  <X className="w-4 h-4" />
-                </button>
+            )}
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Email Address
+              </label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="you@example.com"
+                  required
+                  disabled={loading}
+                  data-testid="auth-email-input"
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50"
+                />
               </div>
             </div>
 
-            {!isMinimized && (
-              <>
-                {/* Messages */}
-                <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-white/50" style={{ maxHeight: '450px' }}>
-                  {messages.map((msg, index) => (
-                    <div
-                      key={index}
-                      className={`flex ${
-                        msg.role === 'user' ? 'justify-end' : 'justify-start'
-                      }`}
-                    >
-                      <div
-                        className={`max-w-[80%] p-3 rounded-2xl ${
-                          msg.role === 'user'
-                            ? 'bg-gradient-to-r from-blue-600 to-green-600 text-white rounded-br-none'
-                            : 'bg-white text-gray-800 rounded-bl-none shadow-md'
-                        }`}
-                      >
-                        <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
-                      </div>
-                    </div>
-                  ))}
-                  {loading && (
-                    <div className="flex justify-start">
-                      <div className="bg-white p-3 rounded-2xl rounded-bl-none shadow-md">
-                        <Loader2 className="w-5 h-5 animate-spin text-blue-600" />
-                      </div>
-                    </div>
-                  )}
-                  <div ref={messagesEndRef} />
-                </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Password
+              </label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  required
+                  disabled={loading}
+                  data-testid="auth-password-input"
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50"
+                />
+              </div>
+              {!isLogin && (
+                <p className="text-xs text-gray-500 mt-1">
+                  Must be 8+ characters with uppercase, lowercase, number, and special character
+                </p>
+              )}
+            </div>
 
-                {/* Input */}
-                <div className="p-4 bg-white/80 border-t border-gray-200">
-                  <div className="flex items-center space-x-2">
-                    <input
-                      type="text"
-                      value={input}
-                      onChange={(e) => setInput(e.target.value)}
-                      onKeyPress={handleKeyPress}
-                      placeholder="Ask me anything..."
-                      disabled={loading}
-                      data-testid="chatbot-input"
-                      className="flex-1 px-4 py-2 rounded-full bg-white border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-                    />
-                    <button
-                      onClick={handleSend}
-                      disabled={loading || !input.trim()}
-                      data-testid="chatbot-send"
-                      className="p-2 rounded-full bg-gradient-to-r from-blue-600 to-green-600 text-white hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      <Send className="w-5 h-5" />
-                    </button>
-                  </div>
-                </div>
-              </>
-            )}
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </>
+            <button
+              type="submit"
+              disabled={loading}
+              data-testid="auth-submit-button"
+              className="w-full py-3 bg-gradient-to-r from-blue-600 to-green-600 text-white font-semibold rounded-lg hover:shadow-lg transform hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center space-x-2"
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  <span>Processing...</span>
+                </>
+              ) : (
+                <span>{isLogin ? 'Sign In' : 'Create Account'}</span>
+              )}
+            </button>
+
+            <div className="text-center">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsLogin(!isLogin);
+                  setEmail('');
+                  setPassword('');
+                  setName('');
+                }}
+                disabled={loading}
+                data-testid="auth-toggle-button"
+                className="text-sm text-blue-600 hover:text-blue-800 font-medium disabled:opacity-50"
+              >
+                {isLogin
+                  ? "Don't have an account? Sign up"
+                  : 'Already have an account? Sign in'}
+              </button>
+            </div>
+          </form>
+        </motion.div>
+      </div>
+    </AnimatePresence>
   );
 };
 
-export default Chatbot;
+export default AuthModal;

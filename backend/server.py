@@ -184,6 +184,23 @@ EVIDENCE: [Your detailed reasoning and evidence]"""
 # Routes
 @api_router.post("/auth/register")
 async def register(user_data: UserRegister):
+    # Validate name
+    if not user_data.name or len(user_data.name.strip()) < 2:
+        raise HTTPException(status_code=400, detail="Name must be at least 2 characters long")
+    
+    # Validate password strength
+    password = user_data.password
+    if len(password) < 8:
+        raise HTTPException(status_code=400, detail="Password must be at least 8 characters long")
+    if not any(c.isupper() for c in password):
+        raise HTTPException(status_code=400, detail="Password must contain at least one uppercase letter")
+    if not any(c.islower() for c in password):
+        raise HTTPException(status_code=400, detail="Password must contain at least one lowercase letter")
+    if not any(c.isdigit() for c in password):
+        raise HTTPException(status_code=400, detail="Password must contain at least one number")
+    if not any(c in '!@#$%^&*(),.?":{}|<>' for c in password):
+        raise HTTPException(status_code=400, detail="Password must contain at least one special character")
+    
     # Check if user exists
     existing_user = await db.users.find_one({"email": user_data.email})
     if existing_user:
@@ -192,7 +209,7 @@ async def register(user_data: UserRegister):
     # Create new user
     user = User(
         email=user_data.email,
-        name=user_data.name
+        name=user_data.name.strip()
     )
     user_dict = user.model_dump()
     user_dict['password_hash'] = hash_password(user_data.password)

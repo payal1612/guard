@@ -5,7 +5,7 @@ from datetime import datetime
 def test_review_request_scenarios():
     """Test the specific scenarios mentioned in the review request"""
     
-    base_url = "https://newshub-67.preview.emergentagent.com/api"
+    base_url = "https://dev-workflow-9.preview.emergentagent.com/api"
     
     print("🚀 Testing Review Request Scenarios")
     print("=" * 50)
